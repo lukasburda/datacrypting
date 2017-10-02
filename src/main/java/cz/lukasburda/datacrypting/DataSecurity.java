@@ -8,6 +8,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.math.BigInteger;
 import java.security.InvalidKeyException;
+import java.security.Key;
 import java.security.KeyFactory;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
@@ -39,7 +40,6 @@ public class DataSecurity {
 	public DataSecurity(){
 		File publicKeyFile = new File(PUBLIC_KEY_FILE);
 		File privateKeyFile = new File(PRIVATE_KEY_FILE);
-		
 		try {
 			keyFactory = KeyFactory.getInstance(ALGORITHM);
 		} catch (NoSuchAlgorithmException e) {
@@ -50,25 +50,19 @@ public class DataSecurity {
 			loadPublicKeyFile(publicKeyFile);
 			loadPrivateKeyFile(privateKeyFile);
 		} else{
-			
-	    	try {
-				KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance(ALGORITHM);
-				keyPairGenerator.initialize(2048);
-		        KeyPair keyPair = keyPairGenerator.generateKeyPair();
-		        privateKey = keyPair.getPrivate();
-		        publicKey = keyPair.getPublic();
-		        rsaPublicKeySpec = keyFactory.getKeySpec(publicKey, RSAPublicKeySpec.class);
-		        rsaPrivateKeySpec = keyFactory.getKeySpec(privateKey, RSAPrivateKeySpec.class);
-		        saveKeyToFile(publicKeyFile, rsaPublicKeySpec.getModulus(), rsaPublicKeySpec.getPublicExponent());
-		        saveKeyToFile(privateKeyFile, rsaPrivateKeySpec.getModulus(), rsaPrivateKeySpec.getPrivateExponent());
-			} catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
-				e.printStackTrace();
-			}
-	    	
+			generateKeys(publicKeyFile, privateKeyFile);	    	
 		}
 	}
 
-	public void doCrypto(String filePath, int operation) {
+	public void encrypt(String filePath){
+		doCrypto(filePath, Cipher.ENCRYPT_MODE, publicKey);
+	}
+	
+	public void decrypt(String filePath){
+		doCrypto(filePath, Cipher.DECRYPT_MODE, privateKey);
+	}
+	
+	private void doCrypto(String filePath, int operation, Key key) {
 		File file = new File(filePath);
         byte[] temp = new byte[(int) file.length()];
         
@@ -76,12 +70,7 @@ public class DataSecurity {
         	 FileInputStream fileInputStream = new FileInputStream(file);
 	         fileInputStream.read(temp);
 	         Cipher cipher = Cipher.getInstance(ALGORITHM);
-	         
-	         if(operation == Cipher.ENCRYPT_MODE)
-	        	 cipher.init(operation, publicKey);
-	         else
-	        	 cipher.init(operation, privateKey);
-	         
+	         cipher.init(operation, key);
 			 byte[] temp1 = cipher.doFinal(temp);
 	         FileOutputStream fileOutputStream = new FileOutputStream(file);
 	         fileOutputStream.write(temp1);
@@ -125,7 +114,6 @@ public class DataSecurity {
 		}
 		
 	}
-	
 	private void loadPrivateKeyFile(File file){
 		
 		try {
@@ -141,5 +129,21 @@ public class DataSecurity {
 			e.printStackTrace();
 		}
 		
+	}
+	
+	private void generateKeys(File publicKeyFile, File privateKeyFile){
+    	try {
+			KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance(ALGORITHM);
+			keyPairGenerator.initialize(2048);
+	        KeyPair keyPair = keyPairGenerator.generateKeyPair();
+	        privateKey = keyPair.getPrivate();
+	        publicKey = keyPair.getPublic();
+	        rsaPublicKeySpec = keyFactory.getKeySpec(publicKey, RSAPublicKeySpec.class);
+	        rsaPrivateKeySpec = keyFactory.getKeySpec(privateKey, RSAPrivateKeySpec.class);
+	        saveKeyToFile(publicKeyFile, rsaPublicKeySpec.getModulus(), rsaPublicKeySpec.getPublicExponent());
+	        saveKeyToFile(privateKeyFile, rsaPrivateKeySpec.getModulus(), rsaPrivateKeySpec.getPrivateExponent());
+		} catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
+			e.printStackTrace();
+		}
 	}
 }

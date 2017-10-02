@@ -8,7 +8,6 @@ import java.awt.TextField;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import javax.crypto.Cipher;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 
@@ -67,7 +66,7 @@ public class Main {
 		Button encryptFileButton = new Button("Encrypt");
 		encryptFileButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				dataSecurity.doCrypto(fileDirField.getText(), Cipher.ENCRYPT_MODE);
+				dataSecurity.encrypt(fileDirField.getText());
 			}
 		});
 		encryptFileButton.setBounds(10, 43, 70, 22);
@@ -76,7 +75,7 @@ public class Main {
 		Button decryptFileButton = new Button("Decrypt");
 		decryptFileButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				dataSecurity.doCrypto(fileDirField.getText(), Cipher.DECRYPT_MODE);
+				dataSecurity.decrypt(fileDirField.getText());
 			}
 		});
 		decryptFileButton.setBounds(86, 43, 70, 22);
