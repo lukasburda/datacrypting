@@ -1,2 +1,2 @@
-# datacrypting
-My school project
+# Data Crypting program
+My school project.
