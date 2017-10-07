@@ -55,14 +55,15 @@ public class DataSecurity {
 	}
 
 	public void encrypt(String filePath){
-		doCrypto(filePath, Cipher.ENCRYPT_MODE, publicKey);
+		
+		doCrypto(filePath, filePath + "-encrypted",Cipher.ENCRYPT_MODE, publicKey);
 	}
 	
 	public void decrypt(String filePath){
-		doCrypto(filePath, Cipher.DECRYPT_MODE, privateKey);
+		doCrypto(filePath, filePath + "-decrypted",Cipher.DECRYPT_MODE, privateKey);
 	}
 	
-	private void doCrypto(String filePath, int operation, Key key) {
+	private void doCrypto(String filePath, String outputFilePath ,int operation, Key key) {
 		File file = new File(filePath);
         byte[] temp = new byte[(int) file.length()];
         
@@ -72,7 +73,7 @@ public class DataSecurity {
 	         Cipher cipher = Cipher.getInstance(ALGORITHM);
 	         cipher.init(operation, key);
 			 byte[] temp1 = cipher.doFinal(temp);
-	         FileOutputStream fileOutputStream = new FileOutputStream(file);
+	         FileOutputStream fileOutputStream = new FileOutputStream(new File(outputFilePath));
 	         fileOutputStream.write(temp1);
 	         fileInputStream.close();
 	         fileOutputStream.close();
