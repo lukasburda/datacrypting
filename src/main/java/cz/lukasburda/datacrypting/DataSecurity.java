@@ -23,126 +23,154 @@ import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
-import javax.swing.JOptionPane;
 
 public class DataSecurity {
 
 	private static final String ALGORITHM = "RSA";
 	private static final String PUBLIC_KEY_FILE = "public.keyfile";
 	private static final String PRIVATE_KEY_FILE = "private.keyfile";
-	
+
 	private KeyFactory keyFactory;
 	private RSAPublicKeySpec rsaPublicKeySpec;
 	private RSAPrivateKeySpec rsaPrivateKeySpec;
 	private PublicKey publicKey;
 	private PrivateKey privateKey;
-	
-	public DataSecurity(){
+
+	public DataSecurity() {
+
 		File publicKeyFile = new File(PUBLIC_KEY_FILE);
 		File privateKeyFile = new File(PRIVATE_KEY_FILE);
+
 		try {
 			keyFactory = KeyFactory.getInstance(ALGORITHM);
 		} catch (NoSuchAlgorithmException e) {
 			e.printStackTrace();
 		}
-		
-		if(publicKeyFile.exists() && privateKeyFile.exists()){
+
+		if (publicKeyFile.exists() && privateKeyFile.exists()) {
 			loadPublicKeyFile(publicKeyFile);
 			loadPrivateKeyFile(privateKeyFile);
-		} else{
-			generateKeys(publicKeyFile, privateKeyFile);	    	
+		} else {
+			generateKeys(publicKeyFile, privateKeyFile);
 		}
 	}
 
-	public void encrypt(String filePath){
-		
-		doCrypto(filePath, filePath + "-encrypted",Cipher.ENCRYPT_MODE, publicKey);
+	public void encrypt(String filePath) throws InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException,
+			IllegalBlockSizeException, BadPaddingException, IOException {
+
+		doCrypto(filePath, Cipher.ENCRYPT_MODE, publicKey);
+
 	}
-	
-	public void decrypt(String filePath){
-		doCrypto(filePath, filePath + "-decrypted",Cipher.DECRYPT_MODE, privateKey);
+
+	public void decrypt(String filePath) throws InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException,
+			IllegalBlockSizeException, BadPaddingException, IOException {
+
+		doCrypto(filePath, Cipher.DECRYPT_MODE, privateKey);
+
 	}
-	
-	private void doCrypto(String filePath, String outputFilePath ,int operation, Key key) {
+
+	private void doCrypto(String filePath, int operation, Key key) throws IOException, NoSuchAlgorithmException,
+			NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
+
 		File file = new File(filePath);
-        byte[] temp = new byte[(int) file.length()];
-        
-         try {
-        	 FileInputStream fileInputStream = new FileInputStream(file);
-	         fileInputStream.read(temp);
-	         Cipher cipher = Cipher.getInstance(ALGORITHM);
-	         cipher.init(operation, key);
-			 byte[] temp1 = cipher.doFinal(temp);
-	         FileOutputStream fileOutputStream = new FileOutputStream(new File(outputFilePath));
-	         fileOutputStream.write(temp1);
-	         fileInputStream.close();
-	         fileOutputStream.close();
-	         JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), "Success!");
-		} catch (IOException | InvalidKeyException | IllegalBlockSizeException | BadPaddingException | NoSuchAlgorithmException | NoSuchPaddingException e) {
-	        JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), "Operation error!", "Error", JOptionPane.ERROR_MESSAGE);    
-		}
-         
+		byte[] temp = new byte[(int) file.length()];
+
+		FileInputStream fileInputStream = new FileInputStream(file);
+		fileInputStream.read(temp);
+
+		Cipher cipher = Cipher.getInstance(ALGORITHM);
+		cipher.init(operation, key);
+
+		byte[] temp1 = cipher.doFinal(temp);
+
+		FileOutputStream fileOutputStream = new FileOutputStream(file);
+		fileOutputStream.write(temp1);
+
+		fileInputStream.close();
+		fileOutputStream.close();
+
 	}
-	
-	private void saveKeyToFile(File file, BigInteger modulus, BigInteger exponent){
-		
+
+	private void saveKeyToFile(File file, BigInteger modulus, BigInteger exponent) {
+
 		try {
+
 			FileOutputStream fileOutputStream = new FileOutputStream(file);
 			ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream);
+
 			objectOutputStream.writeObject(modulus);
 			objectOutputStream.writeObject(exponent);
+
 			fileOutputStream.close();
 			objectOutputStream.close();
+
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+
 	}
-	
-	private void loadPublicKeyFile(File file){
-		
+
+	private void loadPublicKeyFile(File file) {
+
 		try {
+
 			FileInputStream fileInputStream = new FileInputStream(file);
 			ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
+
 			BigInteger modulus = (BigInteger) objectInputStream.readObject();
 			BigInteger exponent = (BigInteger) objectInputStream.readObject();
+
 			rsaPublicKeySpec = new RSAPublicKeySpec(modulus, exponent);
 			publicKey = keyFactory.generatePublic(rsaPublicKeySpec);
+
 			objectInputStream.close();
 			fileInputStream.close();
+
 		} catch (IOException | ClassNotFoundException | InvalidKeySpecException e) {
 			e.printStackTrace();
 		}
-		
+
 	}
-	private void loadPrivateKeyFile(File file){
-		
+
+	private void loadPrivateKeyFile(File file) {
+
 		try {
+
 			FileInputStream fileInputStream = new FileInputStream(file);
 			ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
+
 			BigInteger modulus = (BigInteger) objectInputStream.readObject();
 			BigInteger exponent = (BigInteger) objectInputStream.readObject();
+
 			rsaPrivateKeySpec = new RSAPrivateKeySpec(modulus, exponent);
 			privateKey = keyFactory.generatePrivate(rsaPrivateKeySpec);
+
 			objectInputStream.close();
 			fileInputStream.close();
+
 		} catch (IOException | ClassNotFoundException | InvalidKeySpecException e) {
 			e.printStackTrace();
 		}
-		
+
 	}
-	
-	private void generateKeys(File publicKeyFile, File privateKeyFile){
-    	try {
+
+	private void generateKeys(File publicKeyFile, File privateKeyFile) {
+
+		try {
 			KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance(ALGORITHM);
 			keyPairGenerator.initialize(2048);
-	        KeyPair keyPair = keyPairGenerator.generateKeyPair();
-	        privateKey = keyPair.getPrivate();
-	        publicKey = keyPair.getPublic();
-	        rsaPublicKeySpec = keyFactory.getKeySpec(publicKey, RSAPublicKeySpec.class);
-	        rsaPrivateKeySpec = keyFactory.getKeySpec(privateKey, RSAPrivateKeySpec.class);
-	        saveKeyToFile(publicKeyFile, rsaPublicKeySpec.getModulus(), rsaPublicKeySpec.getPublicExponent());
-	        saveKeyToFile(privateKeyFile, rsaPrivateKeySpec.getModulus(), rsaPrivateKeySpec.getPrivateExponent());
+
+			KeyPair keyPair = keyPairGenerator.generateKeyPair();
+
+			privateKey = keyPair.getPrivate();
+			publicKey = keyPair.getPublic();
+
+			rsaPublicKeySpec = keyFactory.getKeySpec(publicKey, RSAPublicKeySpec.class);
+			rsaPrivateKeySpec = keyFactory.getKeySpec(privateKey, RSAPrivateKeySpec.class);
+
+			saveKeyToFile(publicKeyFile, rsaPublicKeySpec.getModulus(), rsaPublicKeySpec.getPublicExponent());
+			saveKeyToFile(privateKeyFile, rsaPrivateKeySpec.getModulus(), rsaPrivateKeySpec.getPrivateExponent());
+
 		} catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
 			e.printStackTrace();
 		}
