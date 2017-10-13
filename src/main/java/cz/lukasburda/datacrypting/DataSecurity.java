@@ -2,6 +2,7 @@ package cz.lukasburda.datacrypting;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -42,52 +43,65 @@ public class DataSecurity {
 		File privateKeyFile = new File(PRIVATE_KEY_FILE);
 
 		try {
+
 			keyFactory = KeyFactory.getInstance(ALGORITHM);
+
 		} catch (NoSuchAlgorithmException e) {
+
 			e.printStackTrace();
+
 		}
 
 		if (publicKeyFile.exists() && privateKeyFile.exists()) {
+
 			loadPublicKeyFile(publicKeyFile);
 			loadPrivateKeyFile(privateKeyFile);
+
 		} else {
+
 			generateKeys(publicKeyFile, privateKeyFile);
+
 		}
 	}
 
-	public void encrypt(String filePath) throws InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException,
-			IllegalBlockSizeException, BadPaddingException, IOException {
+	public void encrypt(String filePath) throws SecurityException {
 
 		doCrypto(filePath, Cipher.ENCRYPT_MODE, publicKey);
 
 	}
 
-	public void decrypt(String filePath) throws InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException,
-			IllegalBlockSizeException, BadPaddingException, IOException {
+	public void decrypt(String filePath) throws SecurityException {
 
 		doCrypto(filePath, Cipher.DECRYPT_MODE, privateKey);
 
 	}
 
-	private void doCrypto(String filePath, int operation, Key key) throws IOException, NoSuchAlgorithmException,
-			NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
+	private void doCrypto(String filePath, int operation, Key key) throws SecurityException {
 
-		File file = new File(filePath);
-		byte[] temp = new byte[(int) file.length()];
+		try {
 
-		FileInputStream fileInputStream = new FileInputStream(file);
-		fileInputStream.read(temp);
+			File file = new File(filePath);
+			byte[] temp = new byte[(int) file.length()];
 
-		Cipher cipher = Cipher.getInstance(ALGORITHM);
-		cipher.init(operation, key);
+			FileInputStream fileInputStream = new FileInputStream(file);
+			fileInputStream.read(temp);
 
-		byte[] temp1 = cipher.doFinal(temp);
+			Cipher cipher = Cipher.getInstance(ALGORITHM);
+			cipher.init(operation, key);
 
-		FileOutputStream fileOutputStream = new FileOutputStream(file);
-		fileOutputStream.write(temp1);
+			byte[] temp1 = cipher.doFinal(temp);
 
-		fileInputStream.close();
-		fileOutputStream.close();
+			FileOutputStream fileOutputStream = new FileOutputStream(file);
+			fileOutputStream.write(temp1);
+
+			fileInputStream.close();
+			fileOutputStream.close();
+
+		} catch (Throwable cause) {
+
+			throw new SecurityException("Crypto operation throws error!", cause);
+
+		}
 
 	}
 
@@ -105,7 +119,9 @@ public class DataSecurity {
 			objectOutputStream.close();
 
 		} catch (IOException e) {
+
 			e.printStackTrace();
+
 		}
 
 	}
@@ -157,6 +173,7 @@ public class DataSecurity {
 	private void generateKeys(File publicKeyFile, File privateKeyFile) {
 
 		try {
+
 			KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance(ALGORITHM);
 			keyPairGenerator.initialize(2048);
 
@@ -172,7 +189,9 @@ public class DataSecurity {
 			saveKeyToFile(privateKeyFile, rsaPrivateKeySpec.getModulus(), rsaPrivateKeySpec.getPrivateExponent());
 
 		} catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
+
 			e.printStackTrace();
+
 		}
 	}
 }

@@ -4,7 +4,7 @@
 
   <groupId>cz.lukasburda</groupId>
   <artifactId>datacrypting</artifactId>
-  <version>0.0.3</version>
+  <version>0.0.4</version>
   <packaging>jar</packaging>
 
   <name>datacrypting</name>
@@ -31,15 +31,15 @@
       <groupId>org.apache.maven.plugins</groupId>
       <artifactId>maven-jar-plugin</artifactId>
       <version>3.0.2</version>
-      <configuration>
-        <archive>
-          <manifest>
-            <addClasspath>true</addClasspath>
-            <classpathPrefix>lib/</classpathPrefix>
-            <mainClass>cz.lukasburda.datacrypting.Main</mainClass>
-          </manifest>
-        </archive>
-      </configuration>
+	<configuration>
+		<archive>
+			<manifest>
+				<addClasspath>true</addClasspath>
+				<classpathPrefix>lib/</classpathPrefix>
+				<mainClass>cz.lukasburda.datacrypting.CryptoFrame</mainClass>
+			</manifest>
+		</archive>
+	</configuration>
     </plugin>
    </plugins>
   </build>

@@ -76,8 +76,7 @@ public class CryptoFrame {
 				try {
 					dataSecurity.encrypt(fileDirField.getText());
 					JOptionPane.showMessageDialog(frame, "File was encrypted successfully!");
-				} catch (InvalidKeyException | NoSuchAlgorithmException | NoSuchPaddingException
-						| IllegalBlockSizeException | BadPaddingException | IOException exception) {
+				} catch (SecurityException exception) {
 					JOptionPane.showMessageDialog(frame, "Encryption error!", "Error", JOptionPane.ERROR_MESSAGE);
 					exception.printStackTrace();
 				}
@@ -92,8 +91,7 @@ public class CryptoFrame {
 				try {
 					dataSecurity.decrypt(fileDirField.getText());
 					JOptionPane.showMessageDialog(frame, "File was decrypted successfully!");
-				} catch (InvalidKeyException | NoSuchAlgorithmException | NoSuchPaddingException
-						| IllegalBlockSizeException | BadPaddingException | IOException exception) {
+				} catch (SecurityException exception) {
 					JOptionPane.showMessageDialog(frame, "Decryption error!", "Error", JOptionPane.ERROR_MESSAGE);
 					exception.printStackTrace();
 				}
