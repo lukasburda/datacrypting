@@ -62,36 +62,51 @@ public class DataSecurity {
 	}
 
 	private void doCrypto(String filePath, String operation, int cipherOperation, Key key) throws SecurityException {
+		FileInputStream fileInputStream = null;
+		FileOutputStream fileOutputStream = null;
 
 		try {
 			File file = new File(filePath);
 			byte[] temp = new byte[(int) file.length()];
-			FileInputStream fileInputStream = new FileInputStream(file);
+			fileInputStream = new FileInputStream(file);
 			fileInputStream.read(temp);
 			Cipher cipher = Cipher.getInstance(ALGORITHM);
 			cipher.init(cipherOperation, key);
 			byte[] temp1 = cipher.doFinal(temp);
-			FileOutputStream fileOutputStream = new FileOutputStream(filePath + operation);
+			fileOutputStream = new FileOutputStream(filePath + operation);
 			fileOutputStream.write(temp1);
-			fileInputStream.close();
-			fileOutputStream.close();
 		} catch (Throwable cause) {
 			throw new SecurityException("Crypto operation error", cause);
+		} finally {
+			try {
+				fileInputStream.close();
+				fileOutputStream.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 
 	}
 
 	private void saveKeyToFile(File file, BigInteger modulus, BigInteger exponent) {
+		FileOutputStream fileOutputStream = null;
+		ObjectOutputStream objectOutputStream = null;
 
 		try {
-			FileOutputStream fileOutputStream = new FileOutputStream(file);
-			ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream);
+			fileOutputStream = new FileOutputStream(file);
+			objectOutputStream = new ObjectOutputStream(fileOutputStream);
 			objectOutputStream.writeObject(modulus);
 			objectOutputStream.writeObject(exponent);
-			fileOutputStream.close();
-			objectOutputStream.close();
 		} catch (IOException e) {
 			e.printStackTrace();
+		} finally {
+			try {
+				fileOutputStream.close();
+				objectOutputStream.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+
 		}
 
 	}
@@ -129,8 +144,6 @@ public class DataSecurity {
 			BigInteger exponent = (BigInteger) objectInputStream.readObject();
 			RSAPrivateKeySpec rsaPrivateKeySpec = new RSAPrivateKeySpec(modulus, exponent);
 			privateKey = keyFactory.generatePrivate(rsaPrivateKeySpec);
-			objectInputStream.close();
-			fileInputStream.close();
 		} catch (IOException | ClassNotFoundException | InvalidKeySpecException e) {
 			e.printStackTrace();
 		} finally {
