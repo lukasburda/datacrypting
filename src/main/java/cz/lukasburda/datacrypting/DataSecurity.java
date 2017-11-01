@@ -114,6 +114,7 @@ public class DataSecurity {
 	private void loadPublicKeyFile(File file) {
 		FileInputStream fileInputStream = null;
 		ObjectInputStream objectInputStream = null;
+		
 		try {
 			fileInputStream = new FileInputStream(file);
 			objectInputStream = new ObjectInputStream(fileInputStream);
