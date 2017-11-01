@@ -38,7 +38,9 @@ public class DataSecurity {
 			keyFactory = KeyFactory.getInstance(ALGORITHM);
 		} catch (NoSuchAlgorithmException e) {
 			e.printStackTrace();
+			System.exit(-1);
 		}
+
 	}
 
 	public void encrypt(String filePath, String publicKeyFileDir, String privateKeyFileDir) throws SecurityException {
@@ -95,27 +97,34 @@ public class DataSecurity {
 	}
 
 	private void loadPublicKeyFile(File file) {
-
+		FileInputStream fileInputStream = null;
+		ObjectInputStream objectInputStream = null;
 		try {
-			FileInputStream fileInputStream = new FileInputStream(file);
-			ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
+			fileInputStream = new FileInputStream(file);
+			objectInputStream = new ObjectInputStream(fileInputStream);
 			BigInteger modulus = (BigInteger) objectInputStream.readObject();
 			BigInteger exponent = (BigInteger) objectInputStream.readObject();
 			RSAPublicKeySpec rsaPublicKeySpec = new RSAPublicKeySpec(modulus, exponent);
 			publicKey = keyFactory.generatePublic(rsaPublicKeySpec);
-			objectInputStream.close();
-			fileInputStream.close();
 		} catch (IOException | ClassNotFoundException | InvalidKeySpecException e) {
 			e.printStackTrace();
+		} finally {
+			try {
+				fileInputStream.close();
+				objectInputStream.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
-
 	}
 
 	private void loadPrivateKeyFile(File file) {
+		FileInputStream fileInputStream = null;
+		ObjectInputStream objectInputStream = null;
 
 		try {
-			FileInputStream fileInputStream = new FileInputStream(file);
-			ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
+			fileInputStream = new FileInputStream(file);
+			objectInputStream = new ObjectInputStream(fileInputStream);
 			BigInteger modulus = (BigInteger) objectInputStream.readObject();
 			BigInteger exponent = (BigInteger) objectInputStream.readObject();
 			RSAPrivateKeySpec rsaPrivateKeySpec = new RSAPrivateKeySpec(modulus, exponent);
@@ -124,6 +133,13 @@ public class DataSecurity {
 			fileInputStream.close();
 		} catch (IOException | ClassNotFoundException | InvalidKeySpecException e) {
 			e.printStackTrace();
+		} finally {
+			try {
+				fileInputStream.close();
+				objectInputStream.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 
 	}

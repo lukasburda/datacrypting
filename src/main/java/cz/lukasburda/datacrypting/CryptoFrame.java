@@ -13,11 +13,12 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
 public class CryptoFrame {
-
-	private JFrame frame;
-	private DataSecurity dataSecurity;
+	
+	private final String FRAME_NAME = "RSA File Cryptor";
 	private final String FILE_TEXT = "Direction of file";
-
+	private JFrame frame;
+	private static DataSecurity dataSecurity;
+	
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
@@ -36,12 +37,12 @@ public class CryptoFrame {
 	}
 
 	private void initialize() {
-		frame = new JFrame();
+		frame = new JFrame(FRAME_NAME);
 		frame.setResizable(false);
-		frame.setBounds(100, 100, 425, 158);
+		frame.setBounds(100, 100, 449, 164);
 		frame.setLocationRelativeTo(null);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
+		
 		dataSecurity = new DataSecurity();
 
 		Panel appPanel = new Panel();
@@ -61,7 +62,7 @@ public class CryptoFrame {
 				fileDirField.setText(fileChooser.getSelectedFile().getAbsolutePath());
 			}
 		});
-		getFileButton.setBounds(326, 10, 83, 22);
+		getFileButton.setBounds(326, 10, 113, 22);
 		appPanel.add(getFileButton);
 
 		TextField publicKeyFileField = new TextField();
@@ -115,7 +116,7 @@ public class CryptoFrame {
 				publicKeyFileField.setText(jFileChooser.getSelectedFile().getAbsolutePath());
 			}
 		});
-		getPublicKeyButton.setBounds(326, 38, 83, 22);
+		getPublicKeyButton.setBounds(326, 38, 113, 22);
 		appPanel.add(getPublicKeyButton);
 
 		Button getPrivateKeyButton = new Button("Get Priv. Key");
@@ -126,7 +127,7 @@ public class CryptoFrame {
 				publicKeyFileField.setText(jFileChooser.getSelectedFile().getAbsolutePath());
 			}
 		});
-		getPrivateKeyButton.setBounds(326, 66, 83, 22);
+		getPrivateKeyButton.setBounds(326, 66, 113, 22);
 		appPanel.add(getPrivateKeyButton);
 	}
 }
