@@ -13,18 +13,17 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
 public class CryptoFrame {
-	
-	private final String FRAME_NAME = "RSA File Cryptor";
+
+	private JFrame frmRsaEncryptordecryptor;
+	private DataSecurity dataSecurity;
 	private final String FILE_TEXT = "Direction of file";
-	private JFrame frame;
-	private static DataSecurity dataSecurity;
-	
+
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
 					CryptoFrame window = new CryptoFrame();
-					window.frame.setVisible(true);
+					window.frmRsaEncryptordecryptor.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -37,16 +36,17 @@ public class CryptoFrame {
 	}
 
 	private void initialize() {
-		frame = new JFrame(FRAME_NAME);
-		frame.setResizable(false);
-		frame.setBounds(100, 100, 449, 164);
-		frame.setLocationRelativeTo(null);
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		
+		frmRsaEncryptordecryptor = new JFrame();
+		frmRsaEncryptordecryptor.setTitle("RSA Encryptor/Decryptor");
+		frmRsaEncryptordecryptor.setResizable(false);
+		frmRsaEncryptordecryptor.setBounds(100, 100, 425, 158);
+		frmRsaEncryptordecryptor.setLocationRelativeTo(null);
+		frmRsaEncryptordecryptor.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
 		dataSecurity = new DataSecurity();
 
 		Panel appPanel = new Panel();
-		frame.getContentPane().add(appPanel, BorderLayout.CENTER);
+		frmRsaEncryptordecryptor.getContentPane().add(appPanel, BorderLayout.CENTER);
 		appPanel.setLayout(null);
 
 		TextField fileDirField = new TextField();
@@ -59,10 +59,11 @@ public class CryptoFrame {
 			public void actionPerformed(ActionEvent e) {
 				JFileChooser fileChooser = new JFileChooser();
 				fileChooser.showOpenDialog(null);
-				fileDirField.setText(fileChooser.getSelectedFile().getAbsolutePath());
+				if (fileChooser.getSelectedFile() != null)
+					fileDirField.setText(fileChooser.getSelectedFile().getAbsolutePath());
 			}
 		});
-		getFileButton.setBounds(326, 10, 113, 22);
+		getFileButton.setBounds(326, 10, 83, 22);
 		appPanel.add(getFileButton);
 
 		TextField publicKeyFileField = new TextField();
@@ -81,10 +82,11 @@ public class CryptoFrame {
 				try {
 					dataSecurity.encrypt(fileDirField.getText(), publicKeyFileField.getText(),
 							privateKeyFileField.getText());
-					JOptionPane.showMessageDialog(frame, "File was encrypted successfully!");
+					JOptionPane.showMessageDialog(frmRsaEncryptordecryptor, "File was encrypted successfully!");
 					fileDirField.setText(FILE_TEXT);
 				} catch (SecurityException exception) {
-					JOptionPane.showMessageDialog(frame, "Encryption error!", "Error", JOptionPane.ERROR_MESSAGE);
+					JOptionPane.showMessageDialog(frmRsaEncryptordecryptor, "Encryption error!", "Error",
+							JOptionPane.ERROR_MESSAGE);
 					exception.printStackTrace();
 				}
 			}
@@ -97,10 +99,11 @@ public class CryptoFrame {
 			public void actionPerformed(ActionEvent e) {
 				try {
 					dataSecurity.decrypt(fileDirField.getText(), privateKeyFileField.getText());
-					JOptionPane.showMessageDialog(frame, "File was decrypted successfully!");
+					JOptionPane.showMessageDialog(frmRsaEncryptordecryptor, "File was decrypted successfully!");
 					fileDirField.setText(FILE_TEXT);
 				} catch (SecurityException exception) {
-					JOptionPane.showMessageDialog(frame, "Decryption error!", "Error", JOptionPane.ERROR_MESSAGE);
+					JOptionPane.showMessageDialog(frmRsaEncryptordecryptor, "Decryption error!", "Error",
+							JOptionPane.ERROR_MESSAGE);
 					exception.printStackTrace();
 				}
 			}
@@ -113,10 +116,11 @@ public class CryptoFrame {
 			public void actionPerformed(ActionEvent arg0) {
 				JFileChooser jFileChooser = new JFileChooser();
 				jFileChooser.showOpenDialog(null);
-				publicKeyFileField.setText(jFileChooser.getSelectedFile().getAbsolutePath());
+				if (jFileChooser.getSelectedFile() != null)
+					publicKeyFileField.setText(jFileChooser.getSelectedFile().getAbsolutePath());
 			}
 		});
-		getPublicKeyButton.setBounds(326, 38, 113, 22);
+		getPublicKeyButton.setBounds(326, 38, 83, 22);
 		appPanel.add(getPublicKeyButton);
 
 		Button getPrivateKeyButton = new Button("Get Priv. Key");
@@ -124,10 +128,11 @@ public class CryptoFrame {
 			public void actionPerformed(ActionEvent arg0) {
 				JFileChooser jFileChooser = new JFileChooser();
 				jFileChooser.showOpenDialog(null);
-				publicKeyFileField.setText(jFileChooser.getSelectedFile().getAbsolutePath());
+				if (jFileChooser.getSelectedFile() != null)
+					publicKeyFileField.setText(jFileChooser.getSelectedFile().getAbsolutePath());
 			}
 		});
-		getPrivateKeyButton.setBounds(326, 66, 113, 22);
+		getPrivateKeyButton.setBounds(326, 66, 83, 22);
 		appPanel.add(getPrivateKeyButton);
 	}
 }
