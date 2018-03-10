@@ -22,9 +22,9 @@ import javax.crypto.Cipher;
 
 public class DataSecurity {
 
-	private static final String ALGORITHM = "RSA";
 	public static final String PUBLIC_KEY_FILE = "public.keyfile";
 	public static final String PRIVATE_KEY_FILE = "private.keyfile";
+	private final String ALGORITHM = "RSA";
 	private final String ENCRYPTED = "-encrypted";
 	private final String DECRYPTED = "-decrypted";
 
